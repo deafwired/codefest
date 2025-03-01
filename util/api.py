@@ -13,7 +13,7 @@ class API:
             "model": self.model,
             "prompt": prompt,
             # "format": "json",
-            "stream": False
+            "stream": False,
         }
 
         response = requests.post(url, headers=headers, data=json.dumps(payload))
@@ -23,4 +23,4 @@ class API:
         else:
             return f"Error {response.status_code}: {response.text}"
     def summary(self, prompt):
-        return self.queryAi("Summarize the following text in one sentence:\n" + prompt)
+        return self.queryAi("Summarize the following text in one concise sentence:\n" + prompt[:8000])
