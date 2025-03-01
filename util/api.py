@@ -5,7 +5,7 @@ import os
 class API:
     def __init__(self):
         self.host = "http://localhost:11434"
-        self.model = "gemma:2b"
+        self.model = "gemma:7b"
     def queryAi(self, prompt):
         url = f"{self.host}/api/generate"
         headers = { "Content-Type": "application/json" }
@@ -23,4 +23,4 @@ class API:
         else:
             return f"Error {response.status_code}: {response.text}"
     def summary(self, prompt):
-        return self.queryAi("Summarize the following text succinctly. Provide only the summary with no preamble or additional commentary. \nText: " + prompt[:8000])
+        return self.queryAi("Extract the keywords from the following text. Provide only the keywords with no preamble or additional commentary. \nText: " + prompt[:8000])
