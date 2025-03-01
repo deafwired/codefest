@@ -20,6 +20,11 @@
                 /* put packages here */ 
                 python3
                 python3Packages.requests
+                python3Packages.python-pptx
+                python3Packages.python-docx
+                python3Packages.pymupdf
+                python3Packages.pandas
+                python3Packages.watchdog
             ];
 
             shellHook = ''

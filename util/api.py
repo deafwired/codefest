@@ -11,7 +11,7 @@ class API:
         headers = { "Content-Type": "application/json" }
         payload = {
             "model": self.model,
-            "prompt": "Summarize the following text in one sentence:\n" + prompt,
+            "prompt": prompt,
             # "format": "json",
             "stream": False
         }
@@ -22,3 +22,5 @@ class API:
             return response.json().get("response", "No response received")
         else:
             return f"Error {response.status_code}: {response.text}"
+    def summary(prompt):
+        return queryAi("Summarize the following text in one sentence:\n" + prompt)
