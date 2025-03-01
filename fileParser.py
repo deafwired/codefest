@@ -33,22 +33,39 @@ def extract_text_from_pdf(file_path):
     text = "\n".join([page.get_text() for page in doc])
     return text if text else "No extractable text found."
 
-def extract_text(file_path):
-    file_extension = '.pdf'
-    print(file_extension)
-    file_type = classifier.getFileInfo(file_extension)
-    print(file_type)
+def extract_text_default(file_path):
+    extracted_text = ""
+    try:
+        with open(file_path, "r") as file:
+            if file is None:
+                return None
+            for line in file:
+                extracted_text += line.strip("\n") + " "
+        return extracted_text.strip()
+    except FileNotFoundError:
+        print(f"Error: The file '{file_path}' was not found.")
+        return None
+    except IOError:
+        print("Unsupported file type.")
+        return None
 
-    if file_type == "word":
+
+
+
+def extract_text(file_path):
+    file_extension = os.path.splitext(file_path)[1]
+    print(file_extension)
+
+    if file_extension == ".docx":
         return extract_text_from_docx(file_path)
-    elif file_type == "excel":
+    elif file_extension == ".xlsx":
         return extract_text_from_xlsx(file_path)
-    elif file_type == "powerpoint":
+    elif file_extension == ".pptx":
         return extract_text_from_pptx(file_path)
-    elif file_type == "pdf":
+    elif file_extension == ".pdf":
         return extract_text_from_pdf(file_path)
     else:
-        return "Unsupported file format."
+        return extract_text_default(file_path)
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
