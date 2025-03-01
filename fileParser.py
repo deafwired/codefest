@@ -50,11 +50,9 @@ class FileParser:
                     extracted_text += line.strip("\n") + " "
             return extracted_text.strip()
         except FileNotFoundError:
-            print(f"Error: The file '{file_path}' was not found.")
-            return None
+            return "No extractable text found."
         except IOError:
-            print("Unsupported file type.")
-            return None
+            return "Unsupported file type."
 
 
 
@@ -62,6 +60,7 @@ class FileParser:
     def extract_text(self, file_path):
         file_extension = os.path.splitext(file_path)[-1]
 
+        print(file_extension)
         if file_extension == ".docx":
             return self.extract_text_from_docx(file_path)
         elif file_extension == ".xlsx":
@@ -73,16 +72,15 @@ class FileParser:
         else:
             return self.extract_text_default(file_path)
 
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python script.py <file_path>")
-        sys.exit(1)
+    def get_file_path(self):
+        if len(sys.argv) != 2:
+            print("Usage: python script.py <file_path>")
+            sys.exit(1)
 
-    file_path = sys.argv[1]
-    if not os.path.exists(file_path):
-        print("File not found.")
-        sys.exit(1)
-    extract = FileParser()
-    extracted_text = extract.extract_text(file_path)
-    print("\nExtracted Content:\n")
-    print(extracted_text)
+        file_path = sys.argv[1]
+        if not os.path.exists(file_path):
+            print("File not found.")
+            sys.exit(1)
+        extract = FileParser()
+
+        return file_path
