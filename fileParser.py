@@ -1,7 +1,7 @@
 import os
 import sys
-import fitz  # PyMuPDF
-import docx
+import pymupdf
+from docx import Document
 from pptx import Presentation
 from util.fileTypes import FileTypeClassifier
 
@@ -12,7 +12,7 @@ def classify(self, file_path):
 classifier = FileTypeClassifier()
 
 def extract_text_from_docx(file_path):
-    docx.opendocx(file_path)
+    doc = Document(file_path)
     return "\n".join([para.text for para in doc.paragraphs])
 
 def extract_text_from_xlsx(file_path):
@@ -29,12 +29,15 @@ def extract_text_from_pptx(file_path):
     return "\n".join(text)
 
 def extract_text_from_pdf(file_path):
-    doc = fitz.open(file_path)
+    doc = pymupdf.open(file_path)
     text = "\n".join([page.get_text() for page in doc])
     return text if text else "No extractable text found."
 
 def extract_text(file_path):
-    file_type = classifier.classify(file_path)
+    file_extension = '.pdf'
+    print(file_extension)
+    file_type = classifier.getFileInfo(file_extension)
+    print(file_type)
 
     if file_type == "word":
         return extract_text_from_docx(file_path)
