@@ -1,9 +1,11 @@
 import os
 import shutil
 import subprocess
+from collections import defaultdict
+from util.fileTypes import getFileCategory, fileTypes
 
 
-def is_ollama_installed():
+def isOllamaInstalled():
 # Check if Ollama is installed and print its version.
     if shutil.which("ollama") is not None:
         try:
@@ -18,4 +20,4 @@ def is_ollama_installed():
         return False
     
 if __name__ == "__main__":
-    is_ollama_installed()
+    isOllamaInstalled()
