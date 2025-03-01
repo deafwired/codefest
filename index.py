@@ -3,6 +3,7 @@ import shutil
 import subprocess
 from collections import defaultdict
 from util.fileTypes import FileTypeClassifier
+from util.api import Api
 
 
 def isOllamaInstalled():
