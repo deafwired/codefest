@@ -2,28 +2,28 @@ import sys
 
 class FileTypeClassifier:
     def __init__(self):
-        """Initialize the file type dictionary with categories and their support status."""
+        """Initialize the file type dictionary with categories and support status."""
         self.fileTypes = {
-            "Documents": { "supported": True, "extensions": [".txt", ".pdf", ".docx", ".doc", ".odt", ".rtf", ".md"] },
-            "Spreadsheets": { "supported": True, "extensions": [".xlsx", ".xls", ".csv", ".ods"] },
-            "Presentations": { "supported": True, "extensions": [".pptx", ".ppt", ".odp"] },
-            "Photos": { "supported": True, "extensions": [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".svg", ".webp"] },
-            "Videos": { "supported": True, "extensions": [".mp4", ".mkv", ".avi", ".mov", ".flv", ".wmv", ".webm"] },
-            "Audio": { "supported": True, "extensions": [".mp3", ".wav", ".flac", ".aac", ".ogg", ".m4a"] },
-            "Archives": { "supported": False, "extensions": [".zip", ".rar", ".tar", ".gz", ".7z", ".bz2"] },
-            "Executables": { "supported": False, "extensions": [".exe", ".bat", ".sh", ".msi", ".apk", ".app", ".deb", ".rpm"] },
-            "Code Files": { "supported": True, "extensions": [".py", ".js", ".html", ".css", ".java", ".c", ".cpp", ".cs", ".php", ".go", ".swift", ".rb", ".ts"] },
-            "Database": { "supported": False, "extensions": [".sql", ".db", ".sqlite", ".mdb", ".accdb"] },
-            "System Files": { "supported": False, "extensions": [".dll", ".sys", ".ini", ".cfg", ".log"] },
-            "Fonts": { "supported": True, "extensions": [".ttf", ".otf", ".woff", ".woff2"] },
-            "Disk Images": { "supported": False, "extensions": [".iso", ".img", ".vmdk"] },
+            "Documents": {".txt": True, ".pdf": True, ".docx": True, ".doc": True, ".odt": False, ".rtf": False, ".md": True},
+            "Spreadsheets": {".xlsx": True, ".xls": True, ".csv": True, ".ods": False},
+            "Presentations": {".pptx": True, ".ppt": True, ".odp": False},
+            "Photos": {".jpg": False, ".jpeg": False, ".png": False, ".gif": False, ".bmp": False, ".tiff": False, ".svg": False, ".webp": False},
+            "Videos": {".mp4": False, ".mkv": False, ".avi": False, ".mov": False, ".flv": False, ".wmv": False, ".webm": False},
+            "Audio": {".mp3": False, ".wav": False, ".flac": False, ".aac": False, ".ogg": False, ".m4a": False},
+            "Archives": {".zip": False, ".rar": False, ".tar": False, ".gz": False, ".7z": False, ".bz2": False},
+            "Executables": {".exe": False, ".bat": False, ".sh": False, ".msi": False, ".apk": False, ".app": False, ".deb": False, ".rpm": False},
+            "Code Files": {".py": False, ".js": False, ".html": False, ".css": False, ".java": False, ".c": False, ".cpp": False, ".cs": False, ".php": False, ".go": False, ".swift": False, ".rb": False, ".ts": False},
+            "Database": {".sql": False, ".db": False, ".sqlite": False, ".mdb": False, ".accdb": False},
+            "System Files": {".dll": False, ".sys": False, ".ini": False, ".cfg": False, ".log": False},
+            "Fonts": {".ttf": False, ".otf": False, ".woff": False, ".woff2": False},
+            "Disk Images": {".iso": False, ".img": False, ".vmdk": False},
         }
 
-        # Create a flattened extension lookup for quick access
+        # Flatten the structure for quick lookup
         self.extensionMap = {
-            ext: {"category": category, "supported": info["supported"]}
-            for category, info in self.fileTypes.items()
-            for ext in info["extensions"]
+            ext: {"category": category, "supported": supported}
+            for category, extensions in self.fileTypes.items()
+            for ext, supported in extensions.items()
         }
 
     def getFileInfo(self, extension):
