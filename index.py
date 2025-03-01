@@ -3,7 +3,7 @@ import shutil
 import subprocess
 from collections import defaultdict
 from util.fileTypes import FileTypeClassifier
-from util.api import Api
+from Ingest import OrionIngest
 
 
 def isOllamaInstalled():
@@ -20,5 +20,13 @@ def isOllamaInstalled():
         print("Ollama is not installed.")
         return False
     
+
+def my_custom_handle_file(file_path):
+    print(f"Custom handling for: {file_path}")
+
+    
 if __name__ == "__main__":
     isOllamaInstalled()
+    ingest = OrionIngest()
+    ingest.handleFile = my_custom_handle_file
+    ingest.start()
