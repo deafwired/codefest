@@ -1,25 +1,64 @@
 import os
+import sys
 import time
+import logging
+from pathlib import Path
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 
-def checkOrCreateFolder(folderPath):
-    if not os.path.exists(folderPath):
-        os.makedirs(folderPath)
-        print(f"Folder created: {folderPath}")
-    else:
-        print(f"Folder already exists: {folderPath}")
 
-def queryFolderContents(folderPath):
-    while True:
-        print(f"Querying contents of folder: {folderPath}")
-        for filename in os.listdir(folderPath):
-            filePath = os.path.join(folderPath, filename)
-            if os.path.isfile(filePath):
-                print(f"Found file: {filePath}")
-        time.sleep(60)  # Run the task every 60 seconds
+class OrionIngest:
+    def __init__(self):
+        # Determine the user's Documents folder (works on any OS)
+        documents_folder = Path.home() / "Documents"
 
-if __name__ == "__main__":
-    documentsFolder = os.path.expanduser("~/Documents")
-    addToOrionFolder = os.path.join(documentsFolder, "Add to Orion")
+        # Define the required folders
+        self.orion_folder = documents_folder / "Orion"
+        self.add_to_orion_folder = documents_folder / "Add to Orion"
 
-    checkOrCreateFolder(addToOrionFolder)
-    queryFolderContents(addToOrionFolder)
+        # Ensure the folders exist
+        self._setup_folders()
+
+    def _setup_folders(self):
+        for folder in [self.orion_folder, self.add_to_orion_folder]:
+            if not folder.exists():
+                logging.info(f"{folder} does not exist. Creating it.")
+                try:
+                    folder.mkdir(parents=True, exist_ok=True)
+                except Exception as e:
+                    logging.error(f"Error creating folder {folder}: {e}")
+                    sys.exit(1)
+            else:
+                logging.info(f"{folder} exists.")
+
+    def handleFile(self, file_path):
+        print(f"Handling file: {file_path}")
+
+    class OrionEventHandler(FileSystemEventHandler):
+        def __init__(self, ingest_instance):
+            self.ingest_instance = ingest_instance
+
+        def on_created(self, event):
+            self.ingest_instance.handleFile(event.src_path)
+
+    def start(self):
+        # Process existing files in the "Add to Orion" folder
+        for item in self.add_to_orion_folder.glob('*'):
+            if item.is_file():
+                logging.info(f"Processing existing file: {item}")
+                self.handleFile(str(item))
+
+        # Set up watchdog observer for the "Add to Orion" folder
+        event_handler = self.OrionEventHandler(self)
+        observer = Observer()
+        observer.schedule(event_handler, str(self.add_to_orion_folder), recursive=True)
+        observer.start()
+        logging.info(f"Started monitoring {self.add_to_orion_folder}")
+
+        try:
+            while True:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            observer.stop()
+            logging.info("Observer stopped.")
+        observer.join()
