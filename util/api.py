@@ -6,7 +6,7 @@ class API:
     def __init__(self):
         self.host = "http://localhost:11434"
         self.model = "gemma:2b"
-    def queryAi(prompt):
+    def queryAi(self, prompt):
         url = f"{self.host}/api/generate"
         headers = { "Content-Type": "application/json" }
         payload = {
@@ -22,5 +22,5 @@ class API:
             return response.json().get("response", "No response received")
         else:
             return f"Error {response.status_code}: {response.text}"
-    def summary(prompt):
-        return queryAi("Summarize the following text in one sentence:\n" + prompt)
+    def summary(self, prompt):
+        return self.queryAi("Summarize the following text in one sentence:\n" + prompt)

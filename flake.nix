@@ -25,6 +25,7 @@
                 python3Packages.pymupdf
                 python3Packages.pandas
                 python3Packages.watchdog
+                python3Packages.openpyxl
             ];
 
             shellHook = ''

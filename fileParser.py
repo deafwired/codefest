@@ -60,8 +60,7 @@ class FileParser:
 
 
     def extract_text(self, file_path):
-        file_extension = os.path.splitext(file_path)[1]
-        print(file_extension)
+        file_extension = os.path.splitext(file_path)[-1]
 
         if file_extension == ".docx":
             return self.extract_text_from_docx(file_path)
