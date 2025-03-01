@@ -23,4 +23,4 @@ class API:
         else:
             return f"Error {response.status_code}: {response.text}"
     def summary(self, prompt):
-        return self.queryAi("Summarize the following text in one concise sentence:\n" + prompt[:8000])
+        return self.queryAi("Summarize the following text succinctly. Provide only the summary with no preamble or additional commentary. \nText: " + prompt[:8000])
