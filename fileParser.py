@@ -4,17 +4,21 @@ import pymupdf
 import pandas as pd
 from docx import Document
 from pptx import Presentation
-from util.fileTypes import FileTypeClassifier
 
 class FileParser:
+    file_types = {
+        ".docx": "Word Document",
+        ".xlsx": "Excel Spreadsheet",
+        ".pptx": "PowerPoint Presentation",
+        ".pdf": "PDF Document",
+    }
 
     def classify(self, file_path):
         ext = os.path.splitext(file_path)[1].lower()
         return self.file_types.get(ext, "unknown")
 
-    classifier = FileTypeClassifier()
 
-    def extract_text_from_docx(file_path):
+    def extract_text_from_docx(self, file_path):
         doc = Document(file_path)
         return "\n".join([para.text for para in doc.paragraphs])
 
@@ -22,7 +26,7 @@ class FileParser:
         df = pd.read_excel(file_path, engine="openpyxl")
         return df.to_string(index=False)
 
-    def extract_text_from_pptx(file_path):
+    def extract_text_from_pptx(self, file_path):
         prs = Presentation(file_path)
         text = []
         for slide in prs.slides:
@@ -31,12 +35,12 @@ class FileParser:
                     text.append(shape.text)
         return "\n".join(text)
 
-    def extract_text_from_pdf(file_path):
+    def extract_text_from_pdf(self, file_path):
         doc = pymupdf.open(file_path)
         text = "\n".join([page.get_text() for page in doc])
         return text if text else "No extractable text found."
 
-    def extract_text_default(file_path):
+    def extract_text_default(self, file_path):
         extracted_text = ""
         try:
             with open(file_path, "r") as file:
@@ -55,20 +59,20 @@ class FileParser:
 
 
 
-    def extract_text(file_path):
+    def extract_text(self, file_path):
         file_extension = os.path.splitext(file_path)[1]
         print(file_extension)
 
         if file_extension == ".docx":
-            return extract_text_from_docx(file_path)
+            return self.extract_text_from_docx(file_path)
         elif file_extension == ".xlsx":
-            return extract_text_from_xlsx(file_path)
+            return self.extract_text_from_xlsx(file_path)
         elif file_extension == ".pptx":
-            return extract_text_from_pptx(file_path)
+            return self.extract_text_from_pptx(file_path)
         elif file_extension == ".pdf":
-            return extract_text_from_pdf(file_path)
+            return self.extract_text_from_pdf(file_path)
         else:
-            return extract_text_default(file_path)
+            return self.extract_text_default(file_path)
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
@@ -79,7 +83,7 @@ if __name__ == "__main__":
     if not os.path.exists(file_path):
         print("File not found.")
         sys.exit(1)
-
-    extracted_text = extract_text(file_path)
+    extract = FileParser()
+    extracted_text = extract.extract_text(file_path)
     print("\nExtracted Content:\n")
     print(extracted_text)
