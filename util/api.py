@@ -1,26 +1,19 @@
-import requests
-import json
-import os
+from keybert import KeyBERT
 
 class API:
     def __init__(self):
-        self.host = "http://localhost:11434"
-        self.model = "gemma:7b"
+        self.kw_model = KeyBERT()
+    
     def queryAi(self, prompt):
-        url = f"{self.host}/api/generate"
-        headers = { "Content-Type": "application/json" }
-        payload = {
-            "model": self.model,
-            "prompt": prompt,
-            # "format": "json",
-            "stream": False,
-        }
-
-        response = requests.post(url, headers=headers, data=json.dumps(payload))
-
-        if response.status_code == 200:
-            return response.json().get("response", "No response received")
-        else:
-            return f"Error {response.status_code}: {response.text}"
+        keywords = self.kw_model.extract_keywords(
+            prompt,
+            keyphrase_ngram_range=(1, 1),
+            stop_words="english",
+            top_n=20
+        )
+        # Return only the keywords separated by commas
+        return ','.join([word for word, score in keywords])
+    
     def summary(self, prompt):
-        return self.queryAi("Extract the keywords from the following text. Provide only the keywords with no preamble or additional commentary. \nText: " + prompt[:8000])
+        # extract keywords using queryAi
+        return self.queryAi(prompt[:8000])
