@@ -1,5 +1,7 @@
 import os
+import shutil
 import subprocess
+import threading
 import webbrowser
 from PySide6.QtCore import Qt, QFileInfo, QPoint
 from PySide6.QtWidgets import (
@@ -9,6 +11,9 @@ from PySide6.QtWidgets import (
 from PySide6.QtGui import QPixmap
 from util.api import API
 from search import QueryIndex
+from util.fileTypes import FileTypeClassifier
+from FileParser import FileParser
+from Ingest import OrionIngest
 
 class SearchResultWidget(QWidget):
     def __init__(self, text, file_path=None):
@@ -155,7 +160,43 @@ class SearchApp(QWidget):
         else:
             print(f"Folder not found for file: {file_path}")
 
+def isOllamaInstalled():
+    # Check if Ollama is installed and print its version.
+    if shutil.which("ollama") is not None:
+        try:
+            result = subprocess.run(
+                ["ollama", "--version"], capture_output=True, text=True, check=True
+            )
+            print("Ollama is installed. Version:", result.stdout.strip())
+            return True
+        except subprocess.CalledProcessError:
+            print("Ollama not installed.")
+            return False
+    else:
+        print("Ollama is not installed.")
+        return False
+
+def my_custom_handle_file(file_path):
+    fp = FileParser()
+    api = API()
+    split = os.path.splitext(file_path)
+    extension = split[-1]
+    classify = FileTypeClassifier()
+    content = fp.extract_text(file_path)
+    keywords = api.summary(content)
+    newPath = classify.getFileInfo(extension)
+    return os.path.join(newPath["category"], os.path.basename(file_path)), keywords
+
 def main():
+    # Start the ingestion process in a separate thread.
+    isOllamaInstalled()
+    ingest = OrionIngest()
+    ingest.handleFile = my_custom_handle_file
+    ingest_thread = threading.Thread(target=ingest.start, daemon=True)
+    ingest_thread.start()
+    print("Ingest is running in a separate thread. Main script continues executing.")
+
+    # Start the GUI.
     app = QApplication([])
     window = SearchApp()
     window.show()
