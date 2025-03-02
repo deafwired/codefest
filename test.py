@@ -11,8 +11,9 @@ if __name__ == "__main__":
     # summary = api.summary(fp.extract_text(path))
     # print(f"{filename}: {summary}")
     # print(f"{filename} new name: {api.name(summary)}")
-    query = "I am looking for an english syllabus"  # Test query
+    query = "I want a file that pertains to Pokemon"  # Test query
     keywords = api.queryToKeywords(query)
+    print(keywords)
     qi = QueryIndex()
     search_results = qi.generate_search(keywords, "data.csv")
     print(search_results)
