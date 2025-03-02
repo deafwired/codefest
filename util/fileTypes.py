@@ -29,3 +29,6 @@ class FileTypeClassifier:
     def getFileInfo(self, extension):
         """Returns the category and support status of a given file extension."""
         return self.extensionMap.get(extension, {"category": "Unknown", "supported": False})
+    
+    def getFileTypes(self):
+        return self.fileTypes
