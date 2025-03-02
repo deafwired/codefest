@@ -1,7 +1,10 @@
 import os
+import subprocess
+import webbrowser
+from PySide6.QtCore import Qt, QFileInfo
 from PySide6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, 
-    QPushButton, QListWidget, QListWidgetItem, QFileIconProvider
+    QPushButton, QListWidget, QListWidgetItem, QFileIconProvider,
 )
 from PySide6.QtGui import QPixmap
 from PySide6.QtCore import Qt, QFileInfo
@@ -70,9 +73,12 @@ class SearchApp(QWidget):
         layout.addLayout(search_layout)
 
         self.result_list = QListWidget()
+        self.result_list.itemClicked.connect(self.open_file)
         layout.addWidget(self.result_list)
 
         self.setLayout(layout)
+
+        self.file_map = {}
 
     def perform_search(self):
         query = self.search_input.text()
@@ -84,13 +90,37 @@ class SearchApp(QWidget):
         search_results = qi.generate_search(keywords, "data.csv")
 
         self.result_list.clear()
+
         for result in search_results:
             item = QListWidgetItem()
             widget = SearchResultWidget(result, file_path=result)
-            print(result)
             item.setSizeHint(widget.sizeHint())
+
+            item.setData(Qt.UserRole, result)
             self.result_list.addItem(item)
             self.result_list.setItemWidget(item, widget)
+
+    def open_file(self, item):
+        file_path = item.data(Qt.UserRole)
+
+        if file_path and os.path.exists(file_path):
+            print(f"Opening file: {file_path}")  # Debugging output
+            if os.name == 'nt':  # Windows
+                os.startfile(file_path)
+            elif os.name == 'posix':  # macOS and Linux
+                try:
+                    subprocess.run(["xdg-open", file_path], check=True)  # Linux
+                except FileNotFoundError:
+                    try:
+                        subprocess.run(["open", file_path], check=True)  # macOS
+                    except FileNotFoundError:
+                        webbrowser.open(file_path)  # Fallback
+            else:
+                webbrowser.open(file_path)  # Fallback for unknown OS
+
+        else:
+            print(f"File not found: {file_path}")
+
 
 import cProfile
 
