@@ -18,14 +18,27 @@ class API:
         # extract keywords using queryAi
         return self.keywords(prompt[:8000])
 
-    def name(self, prompt):
+    def queryToKeywords(self, prompt):
         url = "http://localhost:11434/api/generate"
         headers = {"Content-Type": "application/json"}
         payload = {
             "model": "gemma:7b",
-            "prompt": "Create only a filename with no description based on these keywords:\n"
-            + prompt,
+            "prompt": "From the given search query, generate a list of keywords for files which would be relevant to the query. The keywords should be separated by commas. \nQuery: " + prompt,
             "stream": False,
+            "format": {
+                "type": "object",
+                "properties": {
+                "keywords": {
+                    "type": "array",
+                    "items": {
+                    "type": "string"
+                    }
+                }
+                },
+                "required": [
+                "keywords"
+                ]
+            }
         }
         response = requests.post(url, headers=headers, data=json.dumps(payload))
         if response.status_code == 200:
