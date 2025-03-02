@@ -13,5 +13,3 @@ class MetaData:
         with open(new_file_path, "a") as file:
             file.write(file_path + ", ")
             file.write(key_words)
-
-        return file
