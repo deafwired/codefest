@@ -1,13 +1,12 @@
 import os
 import subprocess
 import webbrowser
-from PySide6.QtCore import Qt, QFileInfo
+from PySide6.QtCore import Qt, QFileInfo, QPoint
 from PySide6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, 
-    QPushButton, QListWidget, QListWidgetItem, QFileIconProvider,
+    QPushButton, QListWidget, QListWidgetItem, QFileIconProvider, QMenu
 )
 from PySide6.QtGui import QPixmap
-from PySide6.QtCore import Qt, QFileInfo
 from util.api import API
 from search import QueryIndex
 
@@ -20,11 +19,8 @@ class SearchResultWidget(QWidget):
 
         self.thumbnail_label = QLabel()
         self.thumbnail_label.setFixedSize(64, 64)
-        self.thumbnail_label.setStyleSheet(
-            ""
-        )
 
-        # Attempt to retrieve the system icon for the file.
+        # Retrieve the system icon for the file, if possible.
         pixmap = None
         if file_path and os.path.exists(file_path):
             provider = QFileIconProvider()
@@ -32,7 +28,7 @@ class SearchResultWidget(QWidget):
             icon = provider.icon(file_info)
             pixmap = icon.pixmap(64, 64)
 
-        # if no icon could be retrieved, use the generic image.
+        # If no icon was retrieved, use a generic image.
         if pixmap is None or pixmap.isNull():
             pixmap = QPixmap("./assets/generic.png")
             if not pixmap.isNull():
@@ -73,12 +69,14 @@ class SearchApp(QWidget):
         layout.addLayout(search_layout)
 
         self.result_list = QListWidget()
-        self.result_list.itemClicked.connect(self.open_file)
+        # Change here: connect the double-click signal to open_file.
+        self.result_list.itemDoubleClicked.connect(self.open_file)
+        # Enable context menu for the list.
+        self.result_list.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.result_list.customContextMenuRequested.connect(self.show_context_menu)
         layout.addWidget(self.result_list)
 
         self.setLayout(layout)
-
-        self.file_map = {}
 
     def perform_search(self):
         query = self.search_input.text()
@@ -95,16 +93,14 @@ class SearchApp(QWidget):
             item = QListWidgetItem()
             widget = SearchResultWidget(result, file_path=result)
             item.setSizeHint(widget.sizeHint())
-
             item.setData(Qt.UserRole, result)
             self.result_list.addItem(item)
             self.result_list.setItemWidget(item, widget)
 
     def open_file(self, item):
         file_path = item.data(Qt.UserRole)
-
         if file_path and os.path.exists(file_path):
-            print(f"Opening file: {file_path}")  # Debugging output
+            print(f"Opening file: {file_path}")
             if os.name == 'nt':  # Windows
                 os.startfile(file_path)
             elif os.name == 'posix':  # macOS and Linux
@@ -117,12 +113,36 @@ class SearchApp(QWidget):
                         webbrowser.open(file_path)  # Fallback
             else:
                 webbrowser.open(file_path)  # Fallback for unknown OS
-
         else:
             print(f"File not found: {file_path}")
 
+    def show_context_menu(self, pos):
+        item = self.result_list.itemAt(pos)
+        if item is not None:
+            menu = QMenu(self)
+            open_folder_action = menu.addAction("Open Folder")
+            action = menu.exec_(self.result_list.viewport().mapToGlobal(pos))
+            if action == open_folder_action:
+                self.open_folder(item)
 
-import cProfile
+    def open_folder(self, item):
+        file_path = item.data(Qt.UserRole)
+        if file_path and os.path.exists(file_path):
+            folder = os.path.dirname(file_path)
+            print(f"Opening folder: {folder}")
+            if os.name == 'nt':  # Windows: select file in Explorer
+                subprocess.run(["explorer", "/select,", file_path])
+            elif os.name == 'posix':
+                # macOS: use 'open -R' to reveal the file in Finder
+                try:
+                    subprocess.run(["open", "-R", file_path], check=True)
+                except Exception:
+                    # Fallback: open the folder
+                    subprocess.run(["xdg-open", folder])
+            else:
+                webbrowser.open(folder)
+        else:
+            print(f"Folder not found for file: {file_path}")
 
 def main():
     app = QApplication([])
