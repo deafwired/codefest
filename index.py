@@ -1,13 +1,14 @@
 import os
 import shutil
 import subprocess
+import threading
 from collections import defaultdict
 from util.fileTypes import FileTypeClassifier
 from Ingest import OrionIngest
 
 
 def isOllamaInstalled():
-# Check if Ollama is installed and print its version.
+    # Check if Ollama is installed and print its version.
     if shutil.which("ollama") is not None:
         try:
             result = subprocess.run(["ollama", "--version"], capture_output=True, text=True, check=True)
@@ -24,9 +25,15 @@ def isOllamaInstalled():
 def my_custom_handle_file(file_path):
     print(f"Custom handling for: {file_path}")
 
-    
+
 if __name__ == "__main__":
     isOllamaInstalled()
     ingest = OrionIngest()
     ingest.handleFile = my_custom_handle_file
-    ingest.start()
+
+    ingest_thread = threading.Thread(target=ingest.start, daemon=True)
+    ingest_thread.start()
+
+    print("Ingest is running in a separate thread. Main script continues executing.")
+
+    input("Press Enter to exit...")
