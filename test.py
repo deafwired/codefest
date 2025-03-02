@@ -13,12 +13,6 @@ if __name__ == "__main__":
         # print(f"{filename} new name: {api.name(summary)}")
         query = "Tax docs" # Test query
         keywords = api.queryToKeywords(query) # Turn query into keywords
-        parse = json.loads(keywords)
-        singleWords = [] 
-        #Keywords from AI can be multiple words, parse them into single words and remove duplicates
-        for key in parse["keywords"]:
-            for word in key.split(" "):
-                singleWords.append(word)
-        singleWords = list(set(singleWords))
         
-        print(f"{singleWords}")
+
+        print(f"{keywords}")
