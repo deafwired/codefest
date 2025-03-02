@@ -35,7 +35,7 @@ def my_custom_handle_file(file_path):
     content = fp.extract_text(file_path)
     keywords = api.summary(content)
     newPath = classify.getFileInfo(extension)
-    return os.path.join(newPath["category"], os.path.basename(file_path))
+    return os.path.join(newPath["category"], os.path.basename(file_path)), keywords
 
 
 if __name__ == "__main__":

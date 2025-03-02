@@ -6,12 +6,13 @@ from pathlib import Path
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from util.fileTypes import FileTypeClassifier
+from metaData import MetaData
 
 
 class OrionIngest:
     def __init__(self):
         documents_folder = Path.home() / "Documents"
-
+        self.metadata = MetaData()
         self.orion_folder = documents_folder / "Orion"
         self.add_to_orion_folder = documents_folder / "Add to Orion"
 
@@ -53,10 +54,13 @@ class OrionIngest:
 
     def start(self):
         # Process existing files in the "Add to Orion" folder
-        for item in self.add_to_orion_folder.glob('*'):
+        for item in self.add_to_orion_folder.glob("*"):
             if item.is_file():
                 print(f"Processing existing file: {item}")
-                self.handleFile(str(item))
+                path, keywords = self.handleFile(str(item))
+                path = os.path.join(self.orion_folder, path)
+                os.rename(item, path)
+                self.metadata.appendCSV(path, keywords)
 
         # Set up watchdog observer for the "Add to Orion" folder
         event_handler = self.OrionEventHandler(self)
