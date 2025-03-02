@@ -16,6 +16,7 @@ class QueryIndex:
                 file_path = split[0]
                 file_path = os.path.basename(file_path)
                 file_metadata = api.queryToKeywords(file_path)
+                "".join(file_metadata)
                 print(file_metadata)
                 key_words = split[1:]
 
