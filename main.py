@@ -46,6 +46,17 @@ class SearchResultWidget(QWidget):
         layout.addWidget(self.text_label)
         self.setLayout(layout)
 
+class ResultListWidget(QListWidget):
+    def keyPressEvent(self, event):
+        if event.key() in (Qt.Key_Return, Qt.Key_Enter):
+            item = self.currentItem()
+            if item:
+                # Emit the activated signal to open the file.
+                self.itemActivated.emit(item)
+            event.accept()
+        else:
+            super().keyPressEvent(event)
+
 class SearchApp(QWidget):
     def __init__(self):
         super().__init__()
@@ -62,15 +73,17 @@ class SearchApp(QWidget):
 
         search_layout = QHBoxLayout()
         self.search_input = QLineEdit()
+        # When Enter is pressed in the search box, run the search.
+        self.search_input.returnPressed.connect(self.perform_search)
         self.search_button = QPushButton("Search")
         self.search_button.clicked.connect(self.perform_search)
         search_layout.addWidget(self.search_input)
         search_layout.addWidget(self.search_button)
         layout.addLayout(search_layout)
 
-        self.result_list = QListWidget()
-        # Change here: connect the double-click signal to open_file.
-        self.result_list.itemDoubleClicked.connect(self.open_file)
+        self.result_list = ResultListWidget()
+        # Use itemActivated so that Enter or double-click opens the file.
+        self.result_list.itemActivated.connect(self.open_file)
         # Enable context menu for the list.
         self.result_list.setContextMenuPolicy(Qt.CustomContextMenu)
         self.result_list.customContextMenuRequested.connect(self.show_context_menu)
@@ -100,7 +113,7 @@ class SearchApp(QWidget):
     def open_file(self, item):
         file_path = item.data(Qt.UserRole)
         if file_path and os.path.exists(file_path):
-            print(f"Opening file: {file_path}")
+            print(f"Opening file: {file_path}")  # Debug output
             if os.name == 'nt':  # Windows
                 os.startfile(file_path)
             elif os.name == 'posix':  # macOS and Linux
@@ -129,16 +142,14 @@ class SearchApp(QWidget):
         file_path = item.data(Qt.UserRole)
         if file_path and os.path.exists(file_path):
             folder = os.path.dirname(file_path)
-            print(f"Opening folder: {folder}")
+            print(f"Opening folder: {folder}")  # Debug output
             if os.name == 'nt':  # Windows: select file in Explorer
                 subprocess.run(["explorer", "/select,", file_path])
             elif os.name == 'posix':
-                # macOS: use 'open -R' to reveal the file in Finder
                 try:
-                    subprocess.run(["open", "-R", file_path], check=True)
+                    subprocess.run(["open", "-R", file_path], check=True)  # macOS: reveal in Finder
                 except Exception:
-                    # Fallback: open the folder
-                    subprocess.run(["xdg-open", folder])
+                    subprocess.run(["xdg-open", folder])  # Linux fallback
             else:
                 webbrowser.open(folder)
         else:
