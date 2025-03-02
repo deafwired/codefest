@@ -4,7 +4,7 @@ class FileTypeClassifier:
     def __init__(self):
         """Initialize the file type dictionary with categories and support status."""
         self.fileTypes = {
-            "Documents": {".txt": True, ".pdf": True, ".docx": True, ".doc": True, ".odt": False, ".rtf": False, ".md": True},
+            "Documents": {".txt": True, ".pdf": True, ".docx": True, ".doc": False, ".odt": False, ".rtf": False, ".md": True},
             "Spreadsheets": {".xlsx": True, ".xls": True, ".csv": True, ".ods": False},
             "Presentations": {".pptx": True, ".ppt": True, ".odp": False},
             "Photos": {".jpg": False, ".jpeg": False, ".png": False, ".gif": False, ".bmp": False, ".tiff": False, ".svg": False, ".webp": False},

@@ -1,3 +1,3 @@
 # Orion Search
 
-![Orion](./images/logo.png)
+![Orion](./images/splash.png)
