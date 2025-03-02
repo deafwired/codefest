@@ -1,4 +1,4 @@
-from fileParser import FileParser
+from FileParser import FileParser
 from util.api import API
 import os
 
