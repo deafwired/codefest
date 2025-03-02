@@ -12,3 +12,4 @@ pandas~=2.2.3
 keybert~=0.9.0
 PySide6~=6.8.2.1
 pycryptodome~=3.21.0
+openpyxl
