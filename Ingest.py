@@ -9,14 +9,11 @@ from watchdog.events import FileSystemEventHandler
 
 class OrionIngest:
     def __init__(self):
-        # Determine the user's Documents folder (works on any OS)
         documents_folder = Path.home() / "Documents"
 
-        # Define the required folders
         self.orion_folder = documents_folder / "Orion"
         self.add_to_orion_folder = documents_folder / "Add to Orion"
 
-        # Ensure the folders exist
         self._setup_folders()
 
     def _setup_folders(self):

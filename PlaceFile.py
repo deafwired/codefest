@@ -13,7 +13,7 @@ def getCategory(filePath):
     return category
 
 def moveFile(filePath, category):
-    # Placeholder for moving the file to the appropriate category folder
+    # Placeholder
     if category is None:
         print(f"Moving {filePath} to Add-To-Orion/unsupported.")
         return
