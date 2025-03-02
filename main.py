@@ -72,8 +72,17 @@ class SearchApp(QWidget):
         layout = QVBoxLayout()
 
         # Header
-        self.header = QLabel("Orion")
-        self.header.setStyleSheet("font-size: 20px; font-weight: bold;")
+        self.header = QLabel()
+
+        pixmap = QPixmap("images/splash.png")  # Path to your image
+        if not pixmap.isNull():
+            # Scale the image to a width of 800px
+            scaled_pixmap = pixmap.scaledToWidth(800, Qt.SmoothTransformation)
+            self.header.setPixmap(scaled_pixmap)
+            self.header.setAlignment(Qt.AlignCenter)  # Center align the image
+        else:
+            self.header.setText("Orion")
+
         layout.addWidget(self.header)
 
         search_layout = QHBoxLayout()
