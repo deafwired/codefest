@@ -1,51 +1,6 @@
-import os
-from PySide6.QtWidgets import (
-    QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, 
-    QPushButton, QListWidget, QListWidgetItem, QFileIconProvider
-)
-from PySide6.QtGui import QPixmap
-from PySide6.QtCore import Qt, QFileInfo
+from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QListWidget
 from util.api import API
 from search import QueryIndex
-
-class SearchResultWidget(QWidget):
-    def __init__(self, text, file_path=None):
-        super().__init__()
-        layout = QHBoxLayout()
-        layout.setContentsMargins(5, 5, 5, 5)
-        layout.setSpacing(10)
-
-        self.thumbnail_label = QLabel()
-        self.thumbnail_label.setFixedSize(64, 64)
-        self.thumbnail_label.setStyleSheet(
-            ""
-        )
-
-        # Attempt to retrieve the system icon for the file.
-        pixmap = None
-        if file_path and os.path.exists(file_path):
-            provider = QFileIconProvider()
-            file_info = QFileInfo(file_path)
-            icon = provider.icon(file_info)
-            pixmap = icon.pixmap(64, 64)
-
-        # if no icon could be retrieved, use the generic image.
-        if pixmap is None or pixmap.isNull():
-            pixmap = QPixmap("./assets/generic.png")
-            if not pixmap.isNull():
-                pixmap = pixmap.scaled(64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-
-        if pixmap and not pixmap.isNull():
-            self.thumbnail_label.setPixmap(pixmap)
-        else:
-            self.thumbnail_label.setText("No Img")
-
-        self.text_label = QLabel(text)
-        self.text_label.setStyleSheet("font-size: 14px;")
-
-        layout.addWidget(self.thumbnail_label)
-        layout.addWidget(self.text_label)
-        self.setLayout(layout)
 
 class SearchApp(QWidget):
     def __init__(self):
@@ -85,12 +40,7 @@ class SearchApp(QWidget):
 
         self.result_list.clear()
         for result in search_results:
-            item = QListWidgetItem()
-            widget = SearchResultWidget(result, file_path=result)
-            print(result)
-            item.setSizeHint(widget.sizeHint())
-            self.result_list.addItem(item)
-            self.result_list.setItemWidget(item, widget)
+            self.result_list.addItem(result)
 
 if __name__ == "__main__":
     app = QApplication([])
