@@ -3,6 +3,7 @@ from util.api import API
 import os
 import json
 
+
 if __name__ == "__main__":
     for filename in os.listdir("./testFiles/"):
         path = os.path.join("./testFiles", filename)
