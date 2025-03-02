@@ -40,10 +40,11 @@ class OrionIngest:
 
     def start(self):
         # Process existing files in the "Add to Orion" folder
-        for item in self.add_to_orion_folder.glob('*'):
+        for item in self.add_to_orion_folder.glob("*"):
             if item.is_file():
-                logging.info(f"Processing existing file: {item}")
-                self.handleFile(str(item))
+                path = self.handleFile(str(item))
+                path = os.path.join(self.orion_folder, path)
+                os.rename(item, path)
 
         # Set up watchdog observer for the "Add to Orion" folder
         event_handler = self.OrionEventHandler(self)
