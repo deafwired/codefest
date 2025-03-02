@@ -50,16 +50,16 @@ class OrionIngest:
             self.ingest_instance = ingest_instance
 
         def on_created(self, event):
-            self.updateFile(
-                event.src_path, self.ingest_instance.handleFile(event.src_path)
-            )
+            path, keywords = self.ingest_instance.handleFile(event.src_path)
+            self.updateFile(event.src_path, path, keywords)
 
     def start(self):
         # Process existing files in the "Add to Orion" folder
         for item in self.add_to_orion_folder.glob("*"):
             if item.is_file():
                 print(f"Processing existing file: {item}")
-                self.updateFile(item, self.handleFile(str(item)))
+                new, keywords = self.handleFile(str(item))
+                self.updateFile(item, new, keywords)
 
         # Set up watchdog observer for the "Add to Orion" folder
         event_handler = self.OrionEventHandler(self)
@@ -79,4 +79,4 @@ class OrionIngest:
     def updateFile(self, old, new, keywords):
         path = os.path.join(self.orion_folder, new)
         os.rename(old, path)
-        self.metadata.appendCSV(new, keywords)
+        self.metadata.appendCSV(path, keywords)
