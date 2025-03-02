@@ -1,8 +1,7 @@
 from fileinput import filename
-
+from search import QueryIndex
 from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, \
     QListWidget
-
 
 class SearchApp(QWidget):
     def __init__(self):
