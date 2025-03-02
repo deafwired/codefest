@@ -50,13 +50,14 @@ class OrionIngest:
             self.ingest_instance = ingest_instance
 
         def on_created(self, event):
-            path, keywords = self.ingest_instance.handleFile(event.src_path)
-            self.updateFile(event.src_path, path, keywords)
+            if not os.path.basename(event.src_path).startswith("."):  # Ignore dotfiles
+                path, keywords = self.ingest_instance.handleFile(event.src_path)
+                self.ingest_instance.updateFile(event.src_path, path, keywords)
 
     def start(self):
         # Process existing files in the "Add to Orion" folder
         for item in self.add_to_orion_folder.glob("*"):
-            if item.is_file():
+            if item.is_file() and not item.name.startswith("."):  # Ignore dotfiles
                 print(f"Processing existing file: {item}")
                 new, keywords = self.handleFile(str(item))
                 self.updateFile(item, new, keywords)
