@@ -14,12 +14,8 @@ class QueryIndex:
                 split = line.split(",")
                 file_path = split[0]
                 file_metadata = api.queryToKeywords(file_path)
-                "".join(file_metadata)
-                print(file_metadata)
                 key_words = split[1:]
 
-                for item in file_metadata:
-                    key_words.append(item)
 
                 score = sum(1 for word in search if word in key_words)  # Count matches
 
