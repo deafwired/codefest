@@ -74,11 +74,14 @@ class SearchApp(QWidget):
         # Header
         self.header = QLabel()
 
-        pixmap = QPixmap("images/splash.png")  # Path to your image
+        pixmap = QPixmap("./assets/splash2x.png")  # Load image
         if not pixmap.isNull():
-            # Scale the image to a width of 800px
-            scaled_pixmap = pixmap.scaledToWidth(800, Qt.SmoothTransformation)
-            self.header.setPixmap(scaled_pixmap)
+            image = pixmap.toImage()  # Convert to QImage for better scaling
+            scaled_image = image.scaled(800, image.height() * 800 // image.width(),
+                                        Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            high_quality_pixmap = QPixmap.fromImage(scaled_image)
+            
+            self.header.setPixmap(high_quality_pixmap)
             self.header.setAlignment(Qt.AlignCenter)  # Center align the image
         else:
             self.header.setText("Orion")
@@ -147,7 +150,7 @@ class SearchApp(QWidget):
         item = self.result_list.itemAt(pos)
         if item is not None:
             menu = QMenu(self)
-            open_folder_action = menu.addAction("Open Folder")
+            open_folder_action = menu.addAction("Browse in system file explorer")
             action = menu.exec_(self.result_list.viewport().mapToGlobal(pos))
             if action == open_folder_action:
                 self.open_folder(item)
