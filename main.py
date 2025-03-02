@@ -131,4 +131,4 @@ def main():
     app.exec()
 
 if __name__ == "__main__":
-    cProfile.run("main()", "search_profile.prof", sort="cumtime")
+    main()
